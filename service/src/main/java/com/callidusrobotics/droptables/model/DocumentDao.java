@@ -40,7 +40,7 @@ import com.mongodb.WriteResult;
  */
 // Don't extend BasicDao (org.mongodb.morphia.dao.DAO assumes a 1-to-1 mapping of Entity to DBCollection objects)
 public class DocumentDao {
-  public static final String DOC_ID = "_id";
+  public static final String DOC_ID = "id";
   private Datastore datastore;
 
   public DocumentDao(Datastore datastore) {

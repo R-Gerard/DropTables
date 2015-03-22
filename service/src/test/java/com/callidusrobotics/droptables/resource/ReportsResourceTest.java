@@ -106,12 +106,13 @@ public class ReportsResourceTest {
     when(mockDao.save(mockGroovyReport)).thenReturn(mockWriteKey);
 
     // Unit under test
-    Map<String, String> result = resource.upsert(mockGroovyReport);
+    Hypermedia result = resource.upsert(mockGroovyReport);
 
     // Verify results
     verify(mockDao).save(mockGroovyReport);
 
-    assertEquals(ImmutableMap.of(DocumentDao.DOC_ID, mockId.toString()), result);
+    assertEquals(mockId.toString(), result.getId());
+    assertEquals("/reports/" + mockId.toString(), result.getHref());
   }
 
   @Test

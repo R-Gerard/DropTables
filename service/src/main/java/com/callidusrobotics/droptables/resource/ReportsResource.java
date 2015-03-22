@@ -52,7 +52,6 @@ import com.callidusrobotics.droptables.model.ReportGenerator;
 import com.callidusrobotics.droptables.view.ReportEditView;
 import com.callidusrobotics.droptables.view.ReportExecuteView;
 import com.callidusrobotics.droptables.view.ReportListView;
-import com.google.common.collect.ImmutableMap;
 import com.mongodb.WriteResult;
 
 /**
@@ -102,9 +101,17 @@ public class ReportsResource {
     return new ReportListView(reportGenerators);
   }
 
+  /**
+   * Inserts a new entity or updates an existing entity into the database.
+   *
+   * @param entity
+   *          The {@link ReportGenerator} object to upsert into the database
+   * @return A pointer to the created/modified object, never null
+   */
   @POST
-  public Map<String, String> upsert(@Valid ReportGenerator entity) {
-    return ImmutableMap.of(DocumentDao.DOC_ID, dao.save(entity).getId().toString());
+  public Hypermedia upsert(@Valid ReportGenerator entity) {
+    String id = dao.save(entity).getId().toString();
+    return new Hypermedia(id, "/reports/{id}");
   }
 
   /**
@@ -144,7 +151,7 @@ public class ReportsResource {
    *
    * @param id
    *          The {@link ReportGenerator} object to fetch from the database and
-   *          execute
+   *          delete
    * @return The WriteResult, never null
    */
   @Path("/{id}/")
