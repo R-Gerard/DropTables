@@ -19,7 +19,12 @@
           dataType: "json"
         });
 
-        request.always( function(data) {
+        request.done( function(data) {
+          console.log("RECEIVED: " + JSON.stringify(data))
+          window.location = "/results/" + data["_id"];
+        } );
+
+        request.fail( function(data) {
           var newDoc = document.open("text/html", "replace");
           newDoc.write(data.responseText);
           newDoc.close();

@@ -19,6 +19,7 @@ package com.callidusrobotics.droptables.resource;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -51,6 +52,9 @@ import org.mongodb.morphia.Key;
 import com.callidusrobotics.droptables.model.DocumentDao;
 import com.callidusrobotics.droptables.model.ReportDao;
 import com.callidusrobotics.droptables.model.ReportGenerator;
+import com.callidusrobotics.droptables.model.ResultDao;
+import com.callidusrobotics.droptables.model.ResultEntry;
+import com.callidusrobotics.droptables.model.ResultLogMatcher;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
@@ -59,7 +63,8 @@ import com.mongodb.WriteResult;
 public class ReportsResourceTest {
   ReportsResource resource;
 
-  @Mock ReportDao mockDao;
+  @Mock ReportDao mockReportDao;
+  @Mock ResultDao mockResultDao;
   @Mock Datastore mockDatastore;
   @Mock GroovyScriptEngine mockScriptEngine;
   @Mock ObjectId mockId, mockId2, mockId3;
@@ -77,7 +82,7 @@ public class ReportsResourceTest {
 
   @Before
   public void before() throws Exception {
-    resource = new ReportsResource(mockDao, mockDatastore, mockScriptEngine, CACHE_DIR);
+    resource = new ReportsResource(mockReportDao, mockResultDao, mockDatastore, mockScriptEngine, CACHE_DIR);
 
     when(mockObject.get(DocumentDao.DOC_ID)).thenReturn(mockId);
     when(mockObject2.get(DocumentDao.DOC_ID)).thenReturn(mockId2);
@@ -94,7 +99,8 @@ public class ReportsResourceTest {
 
   @After
   public void after() throws Exception {
-    verifyNoMoreInteractions(mockDao);
+    verifyNoMoreInteractions(mockReportDao);
+    verifyNoMoreInteractions(mockResultDao);
     verifyNoMoreInteractions(mockDatastore);
     verifyNoMoreInteractions(mockScriptEngine);
     verifyNoMoreInteractions(mockGroovyReport);
@@ -103,13 +109,13 @@ public class ReportsResourceTest {
   @Test
   public void upsertSuccess() throws Exception {
     when(mockWriteKey.getId()).thenReturn(mockId);
-    when(mockDao.save(mockGroovyReport)).thenReturn(mockWriteKey);
+    when(mockReportDao.save(mockGroovyReport)).thenReturn(mockWriteKey);
 
     // Unit under test
     Hypermedia result = resource.upsert(mockGroovyReport);
 
     // Verify results
-    verify(mockDao).save(mockGroovyReport);
+    verify(mockReportDao).save(mockGroovyReport);
 
     assertEquals(mockId.toString(), result.getId());
     assertEquals("/reports/" + mockId.toString(), result.getHref());
@@ -117,18 +123,25 @@ public class ReportsResourceTest {
 
   @Test
   public void executeSuccess() throws Exception {
-    when(mockDao.get(mockId)).thenReturn(mockGroovyReport);
+    String data = "Hello, " + ((int) (Math.random() * 10000)) + "!";
+    String logId = "" + (int) (Math.random() * 10000);
+    ResultEntry refLog = new ResultEntry();
+    refLog.setData(data);
+    ResultLogMatcher resultLogMatcher = new ResultLogMatcher(refLog);
+
+    when(mockReportDao.get(mockId)).thenReturn(mockGroovyReport);
     when(mockScriptEngine.run(FILENAME, mockBinding)).thenReturn(new Object());
     when(mockTemplate.make(isA(Map.class))).thenReturn(mockWritable);
-    when(mockWritable.toString()).thenReturn("Hello, World!");
+    when(mockWritable.toString()).thenReturn(data);
+    when(mockResultDao.save(argThat(resultLogMatcher))).thenReturn(new Key<ResultEntry>(ResultEntry.class, logId));
 
     Map<String, String> requestBindings = ImmutableMap.of("foo", "bar");
 
     // Unit under test
-    String result = resource.execute(mockId, requestBindings);
+    Hypermedia result = resource.execute(mockId, requestBindings);
 
     // Verify results
-    verify(mockDao).get(mockId);
+    verify(mockReportDao).get(mockId);
     verify(mockScriptEngine).run(FILENAME, mockBinding);
     verify(mockTemplate).make(isA(Map.class));
 
@@ -137,12 +150,15 @@ public class ReportsResourceTest {
     verify(mockGroovyReport).parseBinding();
     verify(mockGroovyReport).writeScript(CACHE_DIR);
 
-    assertEquals(mockWritable.toString(), result);
+    verify(mockResultDao).save(argThat(resultLogMatcher));
+
+    assertEquals(logId, result.getId());
+    assertEquals("/results/" + logId, result.getHref());
   }
 
   @Test(expected = WebApplicationException.class)
   public void executeFailureNotFound() throws Exception {
-    when(mockDao.get(mockId)).thenReturn(null);
+    when(mockReportDao.get(mockId)).thenReturn(null);
 
     Map<String, String> requestBindings = ImmutableMap.of("foo", "bar");
 
@@ -151,7 +167,7 @@ public class ReportsResourceTest {
       resource.execute(mockId, requestBindings);
     } catch (WebApplicationException e) {
       // Verify results
-      verify(mockDao).get(mockId);
+      verify(mockReportDao).get(mockId);
 
       assertEquals(Response.Status.NOT_FOUND, Status.fromStatusCode(e.getResponse().getStatus()));
 
@@ -163,7 +179,7 @@ public class ReportsResourceTest {
   public void executeFailureScriptExecutionException() throws Exception {
     String message = "Problem executing script";
 
-    when(mockDao.get(mockId)).thenReturn(mockGroovyReport);
+    when(mockReportDao.get(mockId)).thenReturn(mockGroovyReport);
     when(mockScriptEngine.run(FILENAME, mockBinding)).thenThrow(new GroovyRuntimeException(message));
     when(mockTemplate.make(isA(Map.class))).thenReturn(mockWritable);
     when(mockWritable.toString()).thenReturn("Hello, World!");
@@ -174,7 +190,7 @@ public class ReportsResourceTest {
     try {
       resource.execute(mockId, requestBindings);
     } catch (WebApplicationException e) {
-      verify(mockDao).get(mockId);
+      verify(mockReportDao).get(mockId);
 
       verify(mockGroovyReport).parseScript();
       verify(mockGroovyReport).parseTemplate();
@@ -194,7 +210,7 @@ public class ReportsResourceTest {
   public void executeFailureTemplateExecutionException() throws Exception {
     String message = "Problem executing template";
 
-    when(mockDao.get(mockId)).thenReturn(mockGroovyReport);
+    when(mockReportDao.get(mockId)).thenReturn(mockGroovyReport);
     when(mockScriptEngine.run(FILENAME, mockBinding)).thenReturn(new Object());
     when(mockTemplate.make(isA(Map.class))).thenThrow(new GroovyRuntimeException(message));
     when(mockWritable.toString()).thenReturn("Hello, World!");
@@ -205,7 +221,7 @@ public class ReportsResourceTest {
     try {
       resource.execute(mockId, requestBindings);
     } catch (WebApplicationException e) {
-      verify(mockDao).get(mockId);
+      verify(mockReportDao).get(mockId);
 
       verify(mockGroovyReport).parseScript();
       verify(mockGroovyReport).parseTemplate();
@@ -225,7 +241,7 @@ public class ReportsResourceTest {
   public void executeFailureScriptParseError() throws Exception {
     String message = "Failed to parse Groovy script";
 
-    when(mockDao.get(mockId)).thenReturn(mockGroovyReport);
+    when(mockReportDao.get(mockId)).thenReturn(mockGroovyReport);
     when(mockGroovyReport.parseScript()).thenThrow(new GroovyRuntimeException(message));
 
     Map<String, String> requestBindings = ImmutableMap.of("foo", "bar");
@@ -234,7 +250,7 @@ public class ReportsResourceTest {
     try {
       resource.execute(mockId, requestBindings);
     } catch (WebApplicationException e) {
-      verify(mockDao).get(mockId);
+      verify(mockReportDao).get(mockId);
 
       verify(mockGroovyReport).parseScript();
 
@@ -249,7 +265,7 @@ public class ReportsResourceTest {
   public void executeFailureTemplatetParseError() throws Exception {
     String message = "Failed to parse template";
 
-    when(mockDao.get(mockId)).thenReturn(mockGroovyReport);
+    when(mockReportDao.get(mockId)).thenReturn(mockGroovyReport);
     when(mockGroovyReport.parseTemplate()).thenThrow(new GroovyRuntimeException(message));
 
     Map<String, String> requestBindings = ImmutableMap.of("foo", "bar");
@@ -258,7 +274,7 @@ public class ReportsResourceTest {
     try {
       resource.execute(mockId, requestBindings);
     } catch (WebApplicationException e) {
-      verify(mockDao).get(mockId);
+      verify(mockReportDao).get(mockId);
 
       verify(mockGroovyReport).parseScript();
       verify(mockGroovyReport).parseTemplate();
@@ -274,7 +290,7 @@ public class ReportsResourceTest {
   public void executeFailureBindingParseError() throws Exception {
     String message = "Failed to initialize variable bindings";
 
-    when(mockDao.get(mockId)).thenReturn(mockGroovyReport);
+    when(mockReportDao.get(mockId)).thenReturn(mockGroovyReport);
     when(mockGroovyReport.parseBinding()).thenThrow(new GroovyRuntimeException(message));
 
     Map<String, String> requestBindings = ImmutableMap.of("foo", "bar");
@@ -283,7 +299,7 @@ public class ReportsResourceTest {
     try {
       resource.execute(mockId, requestBindings);
     } catch (WebApplicationException e) {
-      verify(mockDao).get(mockId);
+      verify(mockReportDao).get(mockId);
 
       verify(mockGroovyReport).parseScript();
       verify(mockGroovyReport).parseTemplate();
@@ -300,7 +316,7 @@ public class ReportsResourceTest {
   public void executeFailureDiskIoError() throws Exception {
     String message = "Failed to write file";
 
-    when(mockDao.get(mockId)).thenReturn(mockGroovyReport);
+    when(mockReportDao.get(mockId)).thenReturn(mockGroovyReport);
     when(mockGroovyReport.writeScript(CACHE_DIR)).thenThrow(new IOException(message));
 
     Map<String, String> requestBindings = ImmutableMap.of("foo", "bar");
@@ -309,7 +325,7 @@ public class ReportsResourceTest {
     try {
       resource.execute(mockId, requestBindings);
     } catch (WebApplicationException e) {
-      verify(mockDao).get(mockId);
+      verify(mockReportDao).get(mockId);
 
       verify(mockGroovyReport).parseScript();
       verify(mockGroovyReport).parseTemplate();
@@ -327,7 +343,7 @@ public class ReportsResourceTest {
   public void executeFailureScriptNpe() throws Exception {
     String message = "Foo is null";
 
-    when(mockDao.get(mockId)).thenReturn(mockGroovyReport);
+    when(mockReportDao.get(mockId)).thenReturn(mockGroovyReport);
     when(mockScriptEngine.run(FILENAME, mockBinding)).thenThrow(new NullPointerException(message));
 
     Map<String, String> requestBindings = ImmutableMap.of("foo", "bar");
@@ -336,7 +352,7 @@ public class ReportsResourceTest {
     try {
       resource.execute(mockId, requestBindings);
     } catch (WebApplicationException e) {
-      verify(mockDao).get(mockId);
+      verify(mockReportDao).get(mockId);
 
       verify(mockGroovyReport).parseScript();
       verify(mockGroovyReport).parseTemplate();
@@ -355,7 +371,7 @@ public class ReportsResourceTest {
   public void executeFailureScriptUndefinedVariable() throws Exception {
     String message = "No such property: foo";
 
-    when(mockDao.get(mockId)).thenReturn(mockGroovyReport);
+    when(mockReportDao.get(mockId)).thenReturn(mockGroovyReport);
     when(mockScriptEngine.run(FILENAME, mockBinding)).thenThrow(new MissingPropertyException(message));
 
     Map<String, String> requestBindings = ImmutableMap.of("foo", "bar");
@@ -364,7 +380,7 @@ public class ReportsResourceTest {
     try {
       resource.execute(mockId, requestBindings);
     } catch (WebApplicationException e) {
-      verify(mockDao).get(mockId);
+      verify(mockReportDao).get(mockId);
 
       verify(mockGroovyReport).parseScript();
       verify(mockGroovyReport).parseTemplate();
@@ -383,7 +399,7 @@ public class ReportsResourceTest {
   public void executeFailureTemplateNpe() throws Exception {
     String message = "Foo is null";
 
-    when(mockDao.get(mockId)).thenReturn(mockGroovyReport);
+    when(mockReportDao.get(mockId)).thenReturn(mockGroovyReport);
     when(mockTemplate.make(isA(Map.class))).thenThrow(new NullPointerException(message));
 
     Map<String, String> requestBindings = ImmutableMap.of("foo", "bar");
@@ -392,7 +408,7 @@ public class ReportsResourceTest {
     try {
       resource.execute(mockId, requestBindings);
     } catch (WebApplicationException e) {
-      verify(mockDao).get(mockId);
+      verify(mockReportDao).get(mockId);
 
       verify(mockGroovyReport).parseScript();
       verify(mockGroovyReport).parseTemplate();

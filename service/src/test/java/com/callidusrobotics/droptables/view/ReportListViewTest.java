@@ -31,8 +31,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.callidusrobotics.droptables.model.ModelUtil;
 import com.callidusrobotics.droptables.model.ReportGenerator;
-import com.callidusrobotics.droptables.model.ReportGeneratorTest;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReportListViewTest {
@@ -46,7 +46,7 @@ public class ReportListViewTest {
   public void before() throws Exception {
     reports = new ArrayList<ReportGenerator>();
     for (int i=0; i<10; i++) {
-      ReportGenerator report = ReportGeneratorTest.buildReport();
+      ReportGenerator report = ModelUtil.buildReport();
       report.setName("Doc " + i);
       reports.add(report);
     }

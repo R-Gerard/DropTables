@@ -30,6 +30,7 @@ import com.callidusrobotics.droptables.health.FileSystemHealthCheck;
 import com.callidusrobotics.droptables.health.MongoHealthCheck;
 import com.callidusrobotics.droptables.resource.DocumentsResource;
 import com.callidusrobotics.droptables.resource.ReportsResource;
+import com.callidusrobotics.droptables.resource.ResultsResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.ImmutableMap;
@@ -73,5 +74,6 @@ public class DropTablesApp extends Application<DropTablesConfig> {
     // Resources
     environment.jersey().register(new DocumentsResource(config, environment));
     environment.jersey().register(new ReportsResource(config, environment));
+    environment.jersey().register(new ResultsResource(config, environment));
   }
 }

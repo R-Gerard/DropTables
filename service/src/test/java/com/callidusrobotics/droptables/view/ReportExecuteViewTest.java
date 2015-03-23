@@ -30,8 +30,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.callidusrobotics.droptables.model.ModelUtil;
 import com.callidusrobotics.droptables.model.ReportGenerator;
-import com.callidusrobotics.droptables.model.ReportGeneratorTest;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReportExecuteViewTest {
@@ -43,7 +43,7 @@ public class ReportExecuteViewTest {
 
   @Before
   public void before() throws Exception {
-    report = ReportGeneratorTest.buildReport();
+    report = ModelUtil.buildReport();
     view = new ReportExecuteView(report);
     renderer = new FreemarkerViewRenderer();
     writer = new ByteArrayOutputStream();

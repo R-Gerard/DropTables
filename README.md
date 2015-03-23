@@ -74,18 +74,26 @@ Upsert the file to the /reports endpoint:
 ```
 curl -X POST -H "Content-Type: application/json" -d @report.json "http://localhost:9000/reports/"
 
-{"_id":"54e8f1dbd9a93c9b467d5380"}
+{"_id":"54e8f1dbd9a93c9b467d5380", "href":"/reports/54e8f1dbd9a93c9b467d5380"}
 ```
 
 ## Execute a Report Generator
 
 Use the _id returned by the upsert:
 
-`curl -X POST -H "Content-Type: application/json" -d "{}" "http://localhost:9000/reports/54e8f1dbd9a93c9b467d5380/results" > results.html`
+```
+curl -X POST -H "Content-Type: application/json" -d "{}" "http://localhost:9000/reports/54e8f1dbd9a93c9b467d5380/results"
+
+{"_id":"550f75b9d4857e811c05857d", "href":"/results/550f75b9d4857e811c05857d"}
+```
+
+Follow the _id returned by the POST to get the results:
+
+`curl "http://localhost:9000/results/550f75b9d4857e811c05857d" > results.html"`
 
 The defaultParameters specified when the report generator was created can be overridden by the request body:
 
-`curl -X POST -H "Content-Type: application/json" -d "{\"bgColor\":\"#FF0000\"}" "http://localhost:9000/reports/54e8f1dbd9a93c9b467d5380/results" > results.html`
+`curl -X POST -H "Content-Type: application/json" -d "{\"bgColor\":\"#FF0000\"}" "http://localhost:9000/reports/54e8f1dbd9a93c9b467d5380/results"`
 
 The contents of /tmp/droptables/groovy/54e8f1dbd9a93c9b467d5380.groovy should be:
 
