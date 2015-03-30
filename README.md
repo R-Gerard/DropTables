@@ -44,11 +44,15 @@ The order of precedence of variable bindings is a hierarchy, where 0 represents 
 | POST | /collections/{collection}/documents | N/A | Upserts a document into the collection. |
 | GET | /collections/{collection}/documents/{id} | N/A | Fetches the specified document from the collection. |
 | DELETE | /collections/{collection}/documents/{id} | N/A | Deletes the specified document from the collection. |
-| GET | /reports | N/A | Lists the IDs of report generators scripts in the "droptables.reports" collection. |
+| GET | /reports | N/A | Lists report generators in the "droptables.reports" collection. |
 | POST | /reports | N/A | Upserts a report generator into the "droptables.reports" collection. |
 | GET | /reports/{id} | N/A | Fetches the specified report generator from the "droptables.reports" collection. |
 | DELETE | /reports/{id} | N/A | Deletes the specified report generator from the "droptables.reports" collection. |
-| POST | /reports/{id}/results | N/A | Executes the specified Groovy script and returns the results as HTML. The request body is a JSON object of key,value pairs to use as variable bindings for the script. |
+| POST | /reports/{id}/results | N/A | Executes the specified report generator and returns a pointer to the results object. The request body is a JSON object of key-value pairs to use as variable bindings for the script. |
+| GET | /results | N/A | Lists the report results found in the "droptables.results" collection. |
+| GET | /results/{id} | N/A | Displays the HTML output of a report. |
+| PUT | /results/{id} | N/A | Modifies an existing result object. The request body is a JSON object of key-value pairs of attributes to modify. |
+| DELETE | /results/{id} | N/A | Deletes the specified result object from the "droptables.results" collection. |
 
 
 # Examples

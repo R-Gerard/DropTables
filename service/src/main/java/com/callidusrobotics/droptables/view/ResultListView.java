@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @author Rusty Gerard
  * @since 0.0.2
+ * @see ResultEntry
  */
 public class ResultListView extends View {
   public static final PeriodFormatter PERIOD_FORMTTER = new PeriodFormatterBuilder()

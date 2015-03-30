@@ -80,13 +80,13 @@ curl -X POST -H "Content-Type: application/json" -d @report.json "http://localho
 Now, execute it:
 
 ```shell
-curl -X POST -H "Content-Type: application/json" -d "{}" "http://localhost:9000/reports/54f9262fb0db29cfff711b99/results" > results.html
+curl -X POST -H "Content-Type: application/json" -d "{}" "http://localhost:9000/reports/54f9262fb0db29cfff711b99/results"
 ```
 
 The time interval is configurable:
 
 ```shell
-curl -X POST -H "Content-Type: application/json" -d "{\"queryStartTime\":\"Oct 30, 2001\", \"queryEndTime\":\"Oct 31, 2001\"}" "http://localhost:9000/reports/54f9262fb0db29cfff711b99/results" > results.html
+curl -X POST -H "Content-Type: application/json" -d "{\"queryStartTime\":\"Oct 30, 2001\", \"queryEndTime\":\"Oct 31, 2001\"}" "http://localhost:9000/reports/54f9262fb0db29cfff711b99/results"
 ```
 
 # Implementation details

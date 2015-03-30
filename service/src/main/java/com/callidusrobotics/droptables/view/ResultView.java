@@ -26,6 +26,7 @@ import com.callidusrobotics.droptables.model.ResultEntry;
  *
  * @author Rusty Gerard
  * @since 0.0.2
+ * @see ResultEntry
  */
 public class ResultView extends View {
   private final ResultEntry result;
