@@ -66,8 +66,8 @@ Create a file called report.json:
   "description": "Queries the database and prints a list of collections",
   "author": "r-gerard",
   "language": "GROOVY",
-  "template": "<html><head><title>Collections</title></head><body bgcolor=\"<% print bgColor %>\"><h1>Collections</h1><ul><% print COLLECTIONS %></ul></body></html>",
-  "script": "// DAO is a global variable with read-only access to Mongo\nCOLLECTIONS = DAO.getCollectionNames().collect { \"<li>\" + it + \"</li>\" }.join(\"\\n\")",
+  "template": "<html>\n  <head>\n    <title>Collections</title>\n  </head>\n <body bgcolor=\"<% print bgColor %>\">\n    <h1>Collections</h1>\n    <ul>\n   <% print COLLECTIONS.collect { \"<li>\" + it + \"</li>\" }.join(\"\\n\") %>\n    </ul>\n  </body>\n</html>\n",
+  "script": "// DATASTORE is an instance of org.mongodb.morphia.Datastore with read-only access to Mongo\nCOLLECTIONS = DATASTORE.getDB().getCollectionNames().findAll { !it.startsWith('system.') && !it.startsWith('droptables.') }",
   "defaultParameters": {
     "bgColor": "#FFFFFF"
   }
@@ -102,8 +102,8 @@ The defaultParameters specified when the report generator was created can be ove
 The contents of /tmp/droptables/groovy/54e8f1dbd9a93c9b467d5380.groovy should be:
 
 ```groovy
-// DAO is a global variable with read-only access to Mongo
-COLLECTIONS = DAO.getCollectionNames().collect { "<li>" + it + "</li>" }.join("\n")
+// DATASTORE is an instance of org.mongodb.morphia.Datastore with read-only access to Mongo
+COLLECTIONS = DATASTORE.getDB().getCollectionNames().findAll { !it.startsWith('system.') && !it.startsWith('droptables.') }
 ```
 
 # Configuring DropTables

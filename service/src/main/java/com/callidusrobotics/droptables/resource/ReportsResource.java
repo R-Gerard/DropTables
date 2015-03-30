@@ -46,7 +46,6 @@ import org.mongodb.morphia.Datastore;
 import com.callidusrobotics.droptables.configuration.DropTablesConfig;
 import com.callidusrobotics.droptables.configuration.MongoFactory;
 import com.callidusrobotics.droptables.exception.HtmlWebApplicationException;
-import com.callidusrobotics.droptables.model.DocumentDao;
 import com.callidusrobotics.droptables.model.ReportDao;
 import com.callidusrobotics.droptables.model.ReportGenerator;
 import com.callidusrobotics.droptables.model.ResultDao;
@@ -235,8 +234,7 @@ public class ReportsResource {
     }
 
     // Give the script read-only access to Mongo
-    DocumentDao docDao = new DocumentDao(roDatastore);
-    binding.setVariable("DAO", docDao);
+    binding.setVariable("DATASTORE", roDatastore);
 
     // Execute the script
     // Note that the script can throw any type of exception, not just the types declared by the engine's run method

@@ -8,7 +8,7 @@ TIMESTAMPS = []
 // Find all documents in the collection where the TaskSet's startTime is in the range [queryStartTime, queryEndTime]
 // Assume all documents in the collection have a valid schema
 query = new BasicDBObject('startTime', new BasicDBObject('$gte', new Date(queryStartTime)).append('$lte', new Date(queryEndTime)));
-dbCollection = DAO.getDatastore().getDB().getCollection(collection)
+dbCollection = DATASTORE.getDB().getCollection(collection)
 dbCursor = dbCollection.find(query)
 while (dbCursor.hasNext()) {
   dbObject = dbCursor.next()
