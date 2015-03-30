@@ -22,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 import io.dropwizard.views.freemarker.FreemarkerViewRenderer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,12 +39,9 @@ import com.callidusrobotics.droptables.model.ModelUtil;
 import com.callidusrobotics.droptables.model.ResultEntry;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ResultListViewTest {
+public class ResultListViewTest extends CommonViewTest {
   ResultListView view;
   List<ResultEntry> results;
-
-  FreemarkerViewRenderer renderer;
-  OutputStream writer;
 
   @Before
   public void before() throws Exception {

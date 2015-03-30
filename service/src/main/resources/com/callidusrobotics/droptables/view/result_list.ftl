@@ -46,6 +46,7 @@
     </style>
   </head>
   <body>
+    <#include "common/navbar.ftl">
     <#if results?has_content>
     <table>
       <tr>

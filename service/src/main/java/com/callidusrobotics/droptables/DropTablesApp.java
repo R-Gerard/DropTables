@@ -29,6 +29,7 @@ import com.callidusrobotics.droptables.exception.HtmlBodyErrorWriter;
 import com.callidusrobotics.droptables.health.FileSystemHealthCheck;
 import com.callidusrobotics.droptables.health.MongoHealthCheck;
 import com.callidusrobotics.droptables.resource.DocumentsResource;
+import com.callidusrobotics.droptables.resource.HomeResource;
 import com.callidusrobotics.droptables.resource.ReportsResource;
 import com.callidusrobotics.droptables.resource.ResultsResource;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -72,6 +73,7 @@ public class DropTablesApp extends Application<DropTablesConfig> {
     environment.healthChecks().register("fileSystem", new FileSystemHealthCheck(config, environment));
 
     // Resources
+    environment.jersey().register(new HomeResource(config, environment));
     environment.jersey().register(new DocumentsResource(config, environment));
     environment.jersey().register(new ReportsResource(config, environment));
     environment.jersey().register(new ResultsResource(config, environment));

@@ -80,6 +80,7 @@
     </script>
   </head>
   <body>
+    <#include "common/navbar.ftl">
     <#if report.id??><b>ID:</b> <input type="text" size="30" id="id" value="${report.id}" readonly="true" /><br></#if>
     <#if report.id??><b>Date Created:</b> <input type="text" size="30" id="created" value="${report.created?string("yyyy-MM-dd HH:mm:ss")}" readonly="true" /><br></#if>
     <#if report.id??><b>Date Modified:</b> <input type="text" size="30" id="modified" value="${report.modified?string("yyyy-MM-dd HH:mm:ss")}" readonly="true" /><br></#if>

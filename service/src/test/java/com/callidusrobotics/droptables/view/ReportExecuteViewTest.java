@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 import io.dropwizard.views.freemarker.FreemarkerViewRenderer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.util.Locale;
 import java.util.Map.Entry;
 
@@ -34,12 +33,9 @@ import com.callidusrobotics.droptables.model.ModelUtil;
 import com.callidusrobotics.droptables.model.ReportGenerator;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ReportExecuteViewTest {
+public class ReportExecuteViewTest extends CommonViewTest {
   ReportExecuteView view;
   ReportGenerator report;
-
-  FreemarkerViewRenderer renderer;
-  OutputStream writer;
 
   @Before
   public void before() throws Exception {

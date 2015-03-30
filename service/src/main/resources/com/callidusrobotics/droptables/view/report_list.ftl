@@ -14,6 +14,7 @@
     </style>
   </head>
   <body>
+    <#include "common/navbar.ftl">
     <h1><a href="/reports/new">Create New Report</a></h1><br>
     <#if reports?has_content>
     <table>

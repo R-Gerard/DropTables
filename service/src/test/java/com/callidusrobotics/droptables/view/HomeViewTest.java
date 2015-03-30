@@ -22,25 +22,20 @@ import io.dropwizard.views.freemarker.FreemarkerViewRenderer;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Locale;
-import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.callidusrobotics.droptables.model.ModelUtil;
-import com.callidusrobotics.droptables.model.ReportGenerator;
-
 @RunWith(MockitoJUnitRunner.class)
-public class ReportEditViewTest extends CommonViewTest {
-  ReportEditView view;
-  ReportGenerator report;
+public class HomeViewTest extends CommonViewTest {
+  HomeView view;
 
   @Before
   public void before() throws Exception {
-    report = ModelUtil.buildReport();
-    view = new ReportEditView(report);
+    view = new HomeView();
     renderer = new FreemarkerViewRenderer();
     writer = new ByteArrayOutputStream();
   }
@@ -53,18 +48,6 @@ public class ReportEditViewTest extends CommonViewTest {
     // Verify results
     String result = writer.toString();
 
-    assertTrue("ID field was not set", result.contains(report.getId().toString()));
-    assertTrue("Name field was not set", result.contains(report.getName()));
-    assertTrue("Author field was not set", result.contains(report.getAuthor()));
-    assertTrue("Description field was not set", result.contains(report.getDescription()));
-    assertTrue("Template field was not set", result.contains(report.getTemplate()));
-    assertTrue("Script field was not set", result.contains(report.getScript()));
-
-    for (Entry<String, String> entry : report.getBinding().entrySet()) {
-      String key = entry.getKey();
-      String val = entry.getValue();
-      assertTrue("defaultParameter key [" + key + "] was not set", result.contains(key));
-      assertTrue("defaultParameter val [" + val + "] was not set", result.contains(val));
-    }
+    assertTrue("No content was rendered", StringUtils.isNotBlank(result));
   }
 }
