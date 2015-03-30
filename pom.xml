@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.callidusrobotics.droptables</groupId>
   <artifactId>droptables-project</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.2</version>
   <packaging>pom</packaging>
   <name>DropTables</name>
 
@@ -33,6 +33,7 @@
     <connection>scm:git:git@github.com:R-Gerard/DropTables.git</connection>
     <developerConnection>scm:git:git@github.com:R-Gerard/DropTables.git</developerConnection>
     <url>http://github.com/R-Gerard/DropTables</url>
+    <tag>0.0.2</tag>
   </scm>
 
   <licenses>
