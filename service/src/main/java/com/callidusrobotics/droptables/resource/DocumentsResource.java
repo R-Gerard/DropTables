@@ -53,6 +53,7 @@ import com.mongodb.WriteResult;
  * @since 0.0.1
  * @see DocumentDao
  */
+@Deprecated // Disabled until auth is implemented
 @Path("/collections/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

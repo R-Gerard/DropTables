@@ -39,11 +39,11 @@ The order of precedence of variable bindings is a hierarchy, where 0 represents 
 
 | HTTP Method | Route | Query Parameters | Description |
 | ----------- | ----- | ---------------- | ----------- |
-| GET | /collections | N/A | Lists collection names in the database. |
-| GET | /collections/{collection} | N/A | Lists IDs of documents in the collection. |
-| POST | /collections/{collection}/documents | N/A | Upserts a document into the collection. |
-| GET | /collections/{collection}/documents/{id} | N/A | Fetches the specified document from the collection. |
-| DELETE | /collections/{collection}/documents/{id} | N/A | Deletes the specified document from the collection. |
+| ~~GET~~ | ~~/collections~~ | ~~N/A~~ | ~~Lists collection names in the database.~~ |
+| ~~GET~~ | ~~/collections/{collection}~~ | ~~N/A~~ | ~~Lists IDs of documents in the collection.~~ |
+| ~~POST~~ | ~~/collections/{collection}/documents~~ | ~~N/A~~ | ~~Upserts a document into the collection.~~ |
+| ~~GET~~ | ~~/collections/{collection}/documents/{id}~~ | ~~N/A~~ | ~~Fetches the specified document from the collection.~~ |
+| ~~DELETE~~ | ~~/collections/{collection}/documents/{id}~~ | ~~N/A~~ | ~~Deletes the specified document from the collection.~~ |
 | GET | /reports | N/A | Lists report generators in the "droptables.reports" collection. |
 | POST | /reports | N/A | Upserts a report generator into the "droptables.reports" collection. |
 | GET | /reports/{id} | N/A | Fetches the specified report generator from the "droptables.reports" collection. |
