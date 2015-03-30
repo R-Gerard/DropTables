@@ -22,7 +22,8 @@
         <td><b>NAME</b></td>
         <td><b>AUTHOR</b></td>
         <td><b>LANGUAGE</b></td>
-        <td colspan="3"><b>DESCRIPTION</b></td>
+        <td><b>DESCRIPTION</b></td>
+        <td colspan="2"><b><center>ACTIONS</center></b></td>
       </tr>
       <#list reports as report>
       <tr>
