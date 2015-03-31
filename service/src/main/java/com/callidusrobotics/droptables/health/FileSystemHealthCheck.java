@@ -40,7 +40,8 @@ public class FileSystemHealthCheck extends HealthCheck {
   @Override
   protected Result check() throws Exception {
     try {
-      if (new File(scriptsCacheDir).canWrite()) {
+      File file = new File(scriptsCacheDir);
+      if (file.isDirectory() && file.canWrite()) {
         return Result.healthy();
       }
     } catch (SecurityException e) {

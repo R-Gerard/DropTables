@@ -56,7 +56,12 @@ public class DropTablesConfig extends Configuration {
 
   @JsonProperty
   public void setScriptsCacheDir(String scriptsCacheDir) {
-    if (! new File(scriptsCacheDir).mkdirs()) {
+    File file = new File(scriptsCacheDir);
+    if (file.exists() && !file.isDirectory()) {
+      LOGGER.error("Specified path already exists but is not a directory: " + scriptsCacheDir);
+    }
+
+    if (!file.exists() && !file.mkdirs()) {
       LOGGER.error("Unable to create directory: " + scriptsCacheDir);
     }
 
