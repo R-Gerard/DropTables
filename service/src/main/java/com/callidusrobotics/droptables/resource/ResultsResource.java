@@ -70,7 +70,6 @@ public class ResultsResource {
    * @return The View, never null
    */
   @Produces({ MediaType.TEXT_HTML, MediaType.APPLICATION_JSON })
-  @Path("/")
   @GET
   public ResultListView list() {
     List<ResultEntry> results = resultDao.find().asList();
