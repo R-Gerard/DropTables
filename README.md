@@ -69,7 +69,11 @@ Create a file called report.json:
   "template": "<html>\n  <head>\n    <title>Collections</title>\n  </head>\n <body bgcolor=\"<% print bgColor %>\">\n    <h1>Collections</h1>\n    <ul>\n   <% print COLLECTIONS.collect { \"<li>\" + it + \"</li>\" }.join(\"\\n\") %>\n    </ul>\n  </body>\n</html>\n",
   "script": "// DATASTORE is an instance of org.mongodb.morphia.Datastore with read-only access to Mongo\nCOLLECTIONS = DATASTORE.getDB().getCollectionNames().findAll { !it.startsWith('system.') && !it.startsWith('droptables.') }",
   "defaultParameters": {
-    "bgColor": "#FFFFFF"
+    "bgColor": {
+      "type": "SELECT",
+      "tooltip": "The background color of the report",
+      "values": [ "#FFFFFF", "#FF0000", "#00FF00", "#0000FF" ]
+    }
   }
 }
 ```

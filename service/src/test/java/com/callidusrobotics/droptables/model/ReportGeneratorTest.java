@@ -25,6 +25,7 @@ import groovy.lang.GroovyRuntimeException;
 import groovy.lang.Script;
 import groovy.text.Template;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,7 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.callidusrobotics.droptables.model.Parameter.ParamType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ReportGeneratorTest {
@@ -62,7 +64,7 @@ public class ReportGeneratorTest {
     reportGenerator.setName("Script1");
     reportGenerator.setDescription("This is a script for testing serialization");
 
-    String expectedJson = "{\"id\":{\"date\":1424552411000,\"time\":1424552411000,\"timestamp\":1424552411,\"timeSecond\":1424552411,\"inc\":1182618496,\"machine\":-643220325,\"new\":false},\"dateCreated\":1111111,\"dateModified\":5555555,\"name\":\"Script1\",\"description\":\"This is a script for testing serialization\",\"author\":\"John Doe\",\"language\":\"GROOVY\",\"template\":\"<html><% print [0, 1, 2] %></html>\",\"script\":\"var1 = [0, 1, 2]\\nprint var1\",\"defaultParameters\":{\"foo\":\"bar\"}}";
+    String expectedJson = "{\"id\":{\"date\":1424552411000,\"time\":1424552411000,\"timestamp\":1424552411,\"timeSecond\":1424552411,\"inc\":1182618496,\"machine\":-643220325,\"new\":false},\"dateCreated\":1111111,\"dateModified\":5555555,\"name\":\"Script1\",\"description\":\"This is a script for testing serialization\",\"author\":\"John Doe\",\"language\":\"GROOVY\",\"template\":\"<html><% print [0, 1, 2] %></html>\",\"script\":\"var1 = [0, 1, 2]\\nprint var1\",\"defaultParameters\":{\"foo\":{\"type\":\"STRING\",\"tooltip\":\"Value for foo\",\"values\":[\"bar\"]}}}";
 
     // Unit under test
     ObjectMapper mapper = new ObjectMapper();
@@ -166,20 +168,20 @@ public class ReportGeneratorTest {
 
   @Test
   public void parseBindingsSuccess() throws Exception {
-    Map<String, String> bindings = new HashMap<String, String>();
-    bindings.put("a", "1");
-    bindings.put("b", "2");
-    bindings.put("c", "3");
+    Map<String, Parameter> defaultParameters = new HashMap<String, Parameter>();
+    defaultParameters.put("a", new Parameter(ParamType.STRING, "Value for 'a'", Arrays.asList("1")));
+    defaultParameters.put("b", new Parameter(ParamType.STRING, "Value for 'b'", Arrays.asList("2")));
+    defaultParameters.put("c", new Parameter(ParamType.STRING, "Value for 'c'", Arrays.asList("3")));
 
     // Unit under test
-    reportGenerator.setBinding(bindings);
+    reportGenerator.setDefaultParameters(defaultParameters);
     Binding result = reportGenerator.parseBinding();
 
     // Verify results
     assertNotNull("Failed to parse variable bindings", result);
-    for (String key : bindings.keySet()) {
+    for (String key : defaultParameters.keySet()) {
       assertTrue("Binding is missing variable \"" + key + "\"", result.hasVariable(key));
-      assertEquals("Binding value is wrong for \"" + key + "\"", (String) bindings.get(key), (String) result.getVariable(key));
+      assertEquals("Binding value is wrong for \"" + key + "\"", (String) defaultParameters.get(key).getDefaultValue(), (String) result.getVariable(key));
     }
   }
 }

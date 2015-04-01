@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -40,6 +41,7 @@ import org.apache.commons.lang3.Validate;
 import org.bson.types.ObjectId;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.PrePersist;
@@ -53,6 +55,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Rusty Gerard
  * @since 0.0.1
+ * @see Parameter
  */
 @Entity("droptables.reports")
 public class ReportGenerator {
@@ -102,8 +105,8 @@ public class ReportGenerator {
 
   @Valid
   @NotNull
-  @Property("defaultParameters")
-  Map<String, String> binding = Collections.emptyMap();
+  @Embedded("defaultParameters")
+  Map<String, Parameter> defaultParameters = Collections.emptyMap();
 
   @PrePersist
   void prePersist() {
@@ -251,15 +254,16 @@ public class ReportGenerator {
   }
 
   @JsonProperty("defaultParameters")
-  public Map<String, String> getBinding() {
-    return Collections.unmodifiableMap(binding);
+  public Map<String, Parameter> getDefaultParameters() {
+    return Collections.unmodifiableMap(defaultParameters);
   }
 
   @JsonProperty("defaultParameters")
-  @SuppressWarnings("unchecked")
-  public void setBinding(Map<String, String> binding) throws InstantiationException, IllegalAccessException {
-    this.binding = binding.getClass().newInstance();
-    this.binding.putAll(binding);
+  public void setDefaultParameters(Map<String, Parameter> binding) throws InstantiationException, IllegalAccessException {
+    this.defaultParameters = new LinkedHashMap<String, Parameter>();
+    for (Entry<String, Parameter> entry : binding.entrySet()) {
+      this.defaultParameters.put(entry.getKey(), new Parameter(entry.getValue()));
+    }
   }
 
   /**
@@ -269,8 +273,8 @@ public class ReportGenerator {
    */
   public Binding parseBinding() {
     Binding result = new Binding();
-    for (Entry<String, String> entry : binding.entrySet()) {
-      result.setVariable(entry.getKey(), entry.getValue());
+    for (Entry<String, Parameter> entry : defaultParameters.entrySet()) {
+      result.setVariable(entry.getKey(), entry.getValue().getDefaultValue());
     }
 
     return result;

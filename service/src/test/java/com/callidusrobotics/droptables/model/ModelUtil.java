@@ -17,11 +17,13 @@
 
 package com.callidusrobotics.droptables.model;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
 import org.bson.types.ObjectId;
 
+import com.callidusrobotics.droptables.model.Parameter.ParamType;
 import com.callidusrobotics.droptables.model.ReportGenerator.Language;
 
 public class ModelUtil {
@@ -37,8 +39,8 @@ public class ModelUtil {
     report.name = "Script" + (int) Math.random() * 10000;
     report.author = "John Doe";
     report.description = "This is a script for unit testing";
-    report.binding = new HashMap<String,String>();
-    report.binding.put("foo", "bar");
+    report.defaultParameters = new HashMap<String, Parameter>();
+    report.defaultParameters.put("foo", new Parameter(ParamType.STRING, "Value for foo", Arrays.asList("bar")));
 
     return report;
   }

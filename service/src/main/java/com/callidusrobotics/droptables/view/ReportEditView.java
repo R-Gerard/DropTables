@@ -22,7 +22,9 @@ import io.dropwizard.views.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.callidusrobotics.droptables.model.Parameter;
 import com.callidusrobotics.droptables.model.ReportGenerator;
+import com.callidusrobotics.droptables.model.Parameter.ParamType;
 import com.callidusrobotics.droptables.model.ReportGenerator.Language;
 
 /**
@@ -59,6 +61,28 @@ public class ReportEditView extends View {
     if (report.getLanguage() != null) {
       result.remove(report.getLanguage().toString());
       result.add(0, report.getLanguage().toString());
+    }
+
+    return result;
+  }
+
+  /**
+   * Generates a list of available parameter types, with the current parameter
+   * type at the front of the list.
+   *
+   * @param parameter
+   *          An optional Parameter object to use to order the list, nullable
+   * @return A list of types, never null
+   * @see Parameter.ParamType
+   */
+  public List<String> getParamTypes(Parameter parameter) {
+    List<String> result = new ArrayList<String>(ParamType.values().length);
+    for (ParamType type : ParamType.values()) {
+      result.add(type.toString());
+    }
+    if (parameter != null) {
+      result.remove(parameter.getType().toString());
+      result.add(0, parameter.getType().toString());
     }
 
     return result;

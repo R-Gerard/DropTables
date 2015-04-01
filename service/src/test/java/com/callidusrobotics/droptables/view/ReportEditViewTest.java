@@ -30,6 +30,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.callidusrobotics.droptables.model.ModelUtil;
+import com.callidusrobotics.droptables.model.Parameter;
 import com.callidusrobotics.droptables.model.ReportGenerator;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -60,9 +61,9 @@ public class ReportEditViewTest extends CommonViewTest {
     assertTrue("Template field was not set", result.contains(report.getTemplate()));
     assertTrue("Script field was not set", result.contains(report.getScript()));
 
-    for (Entry<String, String> entry : report.getBinding().entrySet()) {
+    for (Entry<String, Parameter> entry : report.getDefaultParameters().entrySet()) {
       String key = entry.getKey();
-      String val = entry.getValue();
+      String val = entry.getValue().getDefaultValue();
       assertTrue("defaultParameter key [" + key + "] was not set", result.contains(key));
       assertTrue("defaultParameter val [" + val + "] was not set", result.contains(val));
     }
